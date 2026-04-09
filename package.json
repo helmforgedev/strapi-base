@@ -20,6 +20,8 @@
   },
   "dependencies": {
     "@strapi/strapi": "5.42.0",
+    "@strapi/plugin-users-permissions": "5.42.0",
+    "@strapi/plugin-cloud": "5.42.0",
     "@strapi/plugin-graphql": "5.42.0",
     "@strapi/plugin-sentry": "5.42.0",
     "@strapi/provider-email-nodemailer": "5.42.0",

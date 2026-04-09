@@ -100,11 +100,6 @@ export default ({ env }) => {
     enabled: env.bool('DOCUMENTATION_ENABLED', false),
   };
 
-  // i18n Plugin
-  config.i18n = {
-    enabled: true,
-  };
-
   // Users Permissions Plugin
   config['users-permissions'] = {
     enabled: true,
