@@ -25,7 +25,7 @@ FROM base AS dependencies
 
 COPY --chown=node:node package.json package-lock.json* ./
 
-RUN npm ci --only=production --ignore-scripts && \
+RUN npm install --only=production --ignore-scripts && \
     npm cache clean --force
 
 # ==============================================================================
@@ -36,7 +36,7 @@ FROM base AS build
 COPY --chown=node:node package.json package-lock.json* ./
 
 # Install all dependencies (including devDependencies for build)
-RUN npm ci --ignore-scripts && \
+RUN npm install --ignore-scripts && \
     npm cache clean --force
 
 # Copy source code
