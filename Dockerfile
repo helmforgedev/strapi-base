@@ -12,18 +12,18 @@ RUN apk update && \
     dumb-init \
     && rm -rf /var/cache/apk/*
 
-# Create non-root user
-RUN addgroup -g 1000 strapi && \
-    adduser -u 1000 -G strapi -s /bin/sh -D strapi
+# Use existing node user (UID/GID 1000)
+# No need to create - already exists in node:alpine images
 
 WORKDIR /opt/app
+RUN chown node:node /opt/app
 
 # ==============================================================================
 # Dependencies stage: install production dependencies
 # ==============================================================================
 FROM base AS dependencies
 
-COPY --chown=strapi:strapi package.json package-lock.json* ./
+COPY --chown=node:node package.json package-lock.json* ./
 
 RUN npm ci --only=production --ignore-scripts && \
     npm cache clean --force
@@ -33,14 +33,14 @@ RUN npm ci --only=production --ignore-scripts && \
 # ==============================================================================
 FROM base AS build
 
-COPY --chown=strapi:strapi package.json package-lock.json* ./
+COPY --chown=node:node package.json package-lock.json* ./
 
 # Install all dependencies (including devDependencies for build)
 RUN npm ci --ignore-scripts && \
     npm cache clean --force
 
 # Copy source code
-COPY --chown=strapi:strapi . .
+COPY --chown=node:node . .
 
 # Set build environment
 ENV NODE_ENV=production
@@ -62,28 +62,28 @@ LABEL org.opencontainers.image.title="Strapi Base" \
       org.opencontainers.image.source="https://github.com/helmforgedev/strapi-base"
 
 # Copy production dependencies
-COPY --from=dependencies --chown=strapi:strapi /opt/app/node_modules ./node_modules
+COPY --from=dependencies --chown=node:node /opt/app/node_modules ./node_modules
 
 # Copy built application
-COPY --from=build --chown=strapi:strapi /opt/app/dist ./dist
-COPY --from=build --chown=strapi:strapi /opt/app/build ./build
+COPY --from=build --chown=node:node /opt/app/dist ./dist
+COPY --from=build --chown=node:node /opt/app/build ./build
 
 # Copy runtime files
-COPY --chown=strapi:strapi package.json ./
-COPY --chown=strapi:strapi config ./config
-COPY --chown=strapi:strapi public ./public
-COPY --chown=strapi:strapi src ./src
+COPY --chown=node:node package.json ./
+COPY --chown=node:node config ./config
+COPY --chown=node:node public ./public
+COPY --chown=node:node src ./src
 
 # Create required directories with correct ownership
 RUN mkdir -p .tmp public/uploads && \
-    chown -R strapi:strapi .tmp public/uploads
+    chown -R node:node .tmp public/uploads
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
   CMD node -e "require('http').get('http://localhost:1337/_health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
 # Switch to non-root user
-USER strapi:strapi
+USER node:node
 
 # Expose application port
 EXPOSE 1337
