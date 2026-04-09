@@ -126,11 +126,15 @@ docker build -t strapi-base:dev .
 - Images signed with Cosign
 - SBOM included
 
-## Versions
+## What's Included
 
-- **Strapi**: 5.42.0
-- **Node.js**: 22.14.0 LTS
+- **Strapi**: 5.42.0 (latest stable)
+- **Node.js**: 22.14.0 LTS  
 - **Alpine**: 3.22
+- **Core Plugins**: users-permissions, cloud, GraphQL, Sentry
+- **Upload Providers**: AWS S3, Cloudinary
+- **Email Providers**: SMTP (Nodemailer), SendGrid
+- **Databases**: SQLite, PostgreSQL, MySQL
 
 ## CI/CD
 
