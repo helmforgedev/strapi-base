@@ -69,9 +69,9 @@ COPY --from=build --chown=node:node /opt/app/dist ./dist
 
 # Copy runtime files
 COPY --chown=node:node package.json ./
-COPY --chown=node:node config ./config
+COPY --from=build --chown=node:node /opt/app/dist/config ./config
 COPY --chown=node:node public ./public
-COPY --chown=node:node src ./src
+COPY --from=build --chown=node:node /opt/app/dist/src ./src
 
 # Create required directories with correct ownership
 RUN mkdir -p .tmp public/uploads && \
