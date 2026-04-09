@@ -1,0 +1,170 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ steps.semver.outputs.new_version }}
+      released: ${{ steps.semver.outputs.released }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Calculate next semver from commits
+        id: semver
+        run: |
+          # Get latest tag or default to v0.0.0
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "Latest tag: $LATEST_TAG"
+
+          # Parse current version
+          VERSION="${LATEST_TAG#v}"
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+
+          # Analyze commits since last tag
+          COMMITS=$(git log "${LATEST_TAG}..HEAD" --pretty=format:"%s" 2>/dev/null || git log --pretty=format:"%s")
+
+          if [ -z "$COMMITS" ]; then
+            echo "No new commits since $LATEST_TAG"
+            echo "released=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Determine bump type from conventional commits
+          BUMP="none"
+          while IFS= read -r msg; do
+            if echo "$msg" | grep -qE "^feat(\(.+\))?!:|^fix(\(.+\))?!:|^refactor(\(.+\))?!:|BREAKING CHANGE"; then
+              BUMP="major"
+              break
+            elif echo "$msg" | grep -qE "^feat(\(.+\))?:"; then
+              [ "$BUMP" != "major" ] && BUMP="minor"
+            elif echo "$msg" | grep -qE "^fix(\(.+\))?:|^perf(\(.+\))?:"; then
+              [ "$BUMP" = "none" ] && BUMP="patch"
+            fi
+          done <<< "$COMMITS"
+
+          # Pre-1.0: feat bumps minor, breaking bumps minor
+          if [ "$MAJOR" -eq 0 ]; then
+            [ "$BUMP" = "major" ] && BUMP="minor"
+          fi
+
+          if [ "$BUMP" = "none" ]; then
+            echo "No version-bumping commits (feat/fix/perf/breaking)"
+            echo "released=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Bump version
+          case "$BUMP" in
+            major) MAJOR=$((MAJOR + 1)); MINOR=0; PATCH=0 ;;
+            minor) MINOR=$((MINOR + 1)); PATCH=0 ;;
+            patch) PATCH=$((PATCH + 1)) ;;
+          esac
+
+          NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+          echo "Bump: $BUMP -> v${NEW_VERSION}"
+          echo "new_version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "released=true" >> "$GITHUB_OUTPUT"
+
+          # Generate changelog
+          {
+            echo "## What's Changed"
+            echo ""
+            echo "**Strapi Version**: 5.42.0"
+            echo "**Node.js Version**: 22.14.0"
+            echo ""
+            echo "### Changes"
+            echo ""
+            while IFS= read -r msg; do
+              echo "- ${msg}"
+            done <<< "$COMMITS"
+          } > /tmp/changelog.md
+
+      - name: Create tag and GitHub release
+        if: steps.semver.outputs.released == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="v${{ steps.semver.outputs.new_version }}"
+          git tag "$VERSION"
+          git push origin "$VERSION"
+          gh release create "$VERSION" \
+            --title "$VERSION" \
+            --notes-file /tmp/changelog.md
+
+  build-push:
+    needs: release
+    if: needs.release.outputs.released == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            docker.io/helmforge/strapi-base:${{ needs.release.outputs.new_version }}
+            docker.io/helmforge/strapi-base:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+          sbom: true
+          provenance: true
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Sign image with Cosign (keyless)
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          cosign sign --yes docker.io/helmforge/strapi-base@${DIGEST}
+
+      - name: Trivy vulnerability scan
+        uses: aquasecurity/trivy-action@v0.35.0
+        with:
+          image-ref: docker.io/helmforge/strapi-base:${{ needs.release.outputs.new_version }}
+          format: table
+          severity: CRITICAL,HIGH
+
+      - name: Generate SBOM
+        uses: aquasecurity/trivy-action@v0.35.0
+        with:
+          image-ref: docker.io/helmforge/strapi-base:${{ needs.release.outputs.new_version }}
+          format: cyclonedx
+          output: sbom.json
+
+      - name: Attach SBOM to release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "v${{ needs.release.outputs.new_version }}" sbom.json --clobber
