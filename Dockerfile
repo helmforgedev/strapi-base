@@ -3,7 +3,7 @@
 # ==============================================================================
 # Base stage: shared dependencies and security hardening
 # ==============================================================================
-FROM node:22.14.0-alpine3.22 AS base
+FROM node:22-alpine3.22 AS base
 
 # Install security updates and required tools
 RUN apk update && \
