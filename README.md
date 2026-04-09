@@ -132,6 +132,12 @@ docker build -t strapi-base:dev .
 - **Node.js**: 22.14.0 LTS
 - **Alpine**: 3.22
 
+## CI/CD
+
+Automated release workflow requires GitHub secrets configured at repository settings.
+
+Docker Hub credentials needed for image publishing.
+
 ## Support
 
 - **Chart Docs**: https://helmforge.dev/docs/charts/strapi
