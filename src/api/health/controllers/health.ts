@@ -1,4 +1,4 @@
-export default {
+export default ({ strapi }) => ({
   async index(ctx) {
     try {
       // Check database connection
@@ -12,7 +12,7 @@ export default {
         database: 'connected',
       };
       ctx.status = 200;
-    } catch (error) {
+    } catch (error: any) {
       ctx.body = {
         status: 'error',
         timestamp: new Date().toISOString(),
@@ -21,4 +21,4 @@ export default {
       ctx.status = 503;
     }
   },
-};
+});
