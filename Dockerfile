@@ -66,7 +66,7 @@ COPY --from=dependencies --chown=node:node /opt/app/node_modules ./node_modules
 
 # Copy built application
 COPY --from=build --chown=node:node /opt/app/dist ./dist
-COPY --from=build --chown=node:node /opt/app/build ./build
+COPY --from=build --chown=node:node /opt/app/.strapi ./.strapi
 
 # Copy runtime files
 COPY --chown=node:node package.json ./
