@@ -121,4 +121,4 @@ docker build -t strapi-base:prod -f Dockerfile.prod .
 
 ## License
 
-MIT
+Apache-2.0

@@ -38,5 +38,6 @@
   "strapi": {
     "uuid": "6b97f1ba-0b85-4a32-b38c-dd4bc4dc53cf",
     "installId": "f4cd279ef31b964ed6a29f0f9f0cda4f33a34212c3f2b860e727257d5f1a7d2d"
-  }
+  },
+  "license": "Apache-2.0"
 }
