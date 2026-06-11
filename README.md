@@ -1,24 +1,24 @@
 # Strapi Base
 
-Production-ready Strapi 5.42.0 base image for HelmForge charts.
+Production-ready Strapi 5.47.1 base image for HelmForge charts.
 
 ## Features
 
-- ✅ **Strapi 5.42.0** — Latest stable
-- ✅ **Node.js 22 Alpine** — LTS base
-- ✅ **Multi-database** — SQLite, PostgreSQL, MySQL
-- ✅ **Multi-arch** — linux/amd64, linux/arm64
-- ✅ **Security hardened** — Non-root, minimal Alpine
-- ✅ **Health check** — `/_health` endpoint
-- ✅ **Signed** — Cosign keyless signing
-- ✅ **SBOM** — Software Bill of Materials included
+- **Strapi 5.47.1** - Latest stable
+- **Node.js 22 Alpine** - LTS base
+- **Multi-database** - SQLite, PostgreSQL, MySQL
+- **Multi-arch** - linux/amd64, linux/arm64
+- **Security hardened** - Non-root, minimal Alpine
+- **Health check** - `/_health` endpoint
+- **Signed** - Cosign keyless signing
+- **SBOM** - Software Bill of Materials included
 
 ## Quick Start
 
 ### Docker
 
 ```bash
-docker pull helmforge/strapi-base:latest
+docker pull helmforge/strapi-base:5.47.1
 
 docker run -p 1337:1337 \
   -e APP_KEYS="key1,key2,key3,key4" \
@@ -26,7 +26,7 @@ docker run -p 1337:1337 \
   -e ADMIN_JWT_SECRET="your-secret" \
   -e JWT_SECRET="your-secret" \
   -e TRANSFER_TOKEN_SALT="your-salt" \
-  helmforge/strapi-base:latest
+  helmforge/strapi-base:5.47.1
 ```
 
 ### Docker Compose
@@ -51,12 +51,12 @@ helm install strapi helmforge/strapi
 
 **Development** (Content-Type Builder enabled):
 ```bash
-docker run -e NODE_ENV=development helmforge/strapi-base:latest
+docker run -e NODE_ENV=development helmforge/strapi-base:5.47.1
 ```
 
 **Production** (optimized, schema fixed):
 ```bash
-docker run -e NODE_ENV=production helmforge/strapi-base:latest
+docker run -e NODE_ENV=production helmforge/strapi-base:5.47.1
 ```
 
 ## Environment Variables
@@ -92,7 +92,7 @@ Response:
   "timestamp": "2026-04-10T02:00:00.000Z",
   "uptime": 123.45,
   "database": "connected",
-  "version": "5.42.0"
+  "version": "5.47.1"
 }
 ```
 

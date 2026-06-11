@@ -38,7 +38,7 @@ jobs:
           body: |
             ## Strapi Base ${{ steps.semver.outputs.version }}
 
-            Production-ready Strapi 5.42.0 base image with Node.js 22.
+            Production-ready Strapi 5.47.1 base image with Node.js 22.
 
             ### Features
             - Multi-database support (SQLite, PostgreSQL, MySQL)
