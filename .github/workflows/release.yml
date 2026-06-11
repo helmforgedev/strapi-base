@@ -11,6 +11,7 @@ jobs:
       contents: write
     outputs:
       version: ${{ steps.semver.outputs.version }}
+      strapi_version: ${{ steps.strapi.outputs.version }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -27,6 +28,13 @@ jobs:
           NEW=$(echo $LAST | awk -F. -v OFS=. '{$NF+=1; print}')
           echo "New version: $NEW"
           echo "version=$NEW" >> $GITHUB_OUTPUT
+
+      - name: Get Strapi version
+        id: strapi
+        run: |
+          STRAPI_VERSION=$(node -p "require('./package.json').dependencies['@strapi/strapi']")
+          echo "Strapi version: $STRAPI_VERSION"
+          echo "version=$STRAPI_VERSION" >> $GITHUB_OUTPUT
 
       - name: Create Release
         uses: actions/create-release@v1
@@ -50,7 +58,7 @@ jobs:
 
             ### Docker
             \`\`\`bash
-            docker pull helmforge/strapi-base:${{ steps.semver.outputs.version }}
+            docker pull helmforge/strapi-base:${{ steps.strapi.outputs.version }}
             \`\`\`
           draft: false
           prerelease: false
@@ -86,6 +94,7 @@ jobs:
           push: true
           tags: |
             helmforge/strapi-base:${{ needs.release.outputs.version }}
+            helmforge/strapi-base:${{ needs.release.outputs.strapi_version }}
             helmforge/strapi-base:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -96,7 +105,8 @@ jobs:
       - name: Sign image
         run: |
           cosign sign --yes \
-            helmforge/strapi-base:${{ needs.release.outputs.version }}
+            helmforge/strapi-base:${{ needs.release.outputs.version }} \
+            helmforge/strapi-base:${{ needs.release.outputs.strapi_version }}
 
       - name: Install Syft
         run: |
