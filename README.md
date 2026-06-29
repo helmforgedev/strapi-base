@@ -1,10 +1,10 @@
 # Strapi Base
 
-Production-ready Strapi 5.47.1 base image for HelmForge charts.
+Production-ready Strapi 5.49.0 base image for HelmForge charts.
 
 ## Features
 
-- **Strapi 5.47.1** - Latest stable
+- **Strapi 5.49.0** - Latest stable
 - **Node.js 22 Alpine** - LTS base
 - **Multi-database** - SQLite, PostgreSQL, MySQL
 - **Multi-arch** - linux/amd64, linux/arm64
@@ -18,7 +18,7 @@ Production-ready Strapi 5.47.1 base image for HelmForge charts.
 ### Docker
 
 ```bash
-docker pull helmforge/strapi-base:5.47.1
+docker pull helmforge/strapi-base:5.49.0
 
 docker run -p 1337:1337 \
   -e APP_KEYS="key1,key2,key3,key4" \
@@ -26,7 +26,8 @@ docker run -p 1337:1337 \
   -e ADMIN_JWT_SECRET="your-secret" \
   -e JWT_SECRET="your-secret" \
   -e TRANSFER_TOKEN_SALT="your-salt" \
-  helmforge/strapi-base:5.47.1
+  -e ENCRYPTION_KEY="your-encryption-key" \
+  helmforge/strapi-base:5.49.0
 ```
 
 ### Docker Compose
@@ -51,12 +52,12 @@ helm install strapi helmforge/strapi
 
 **Development** (Content-Type Builder enabled):
 ```bash
-docker run -e NODE_ENV=development helmforge/strapi-base:5.47.1
+docker run -e NODE_ENV=development helmforge/strapi-base:5.49.0
 ```
 
 **Production** (optimized, schema fixed):
 ```bash
-docker run -e NODE_ENV=production helmforge/strapi-base:5.47.1
+docker run -e NODE_ENV=production helmforge/strapi-base:5.49.0
 ```
 
 ## Environment Variables
@@ -69,6 +70,7 @@ See [.env.example](.env.example) for all configuration options.
 - `ADMIN_JWT_SECRET` - Admin JWT secret
 - `JWT_SECRET` - User JWT secret
 - `TRANSFER_TOKEN_SALT` - Transfer token salt
+- `ENCRYPTION_KEY` - Admin encryption key
 
 ### Database (PostgreSQL)
 - `DATABASE_CLIENT=postgres`
@@ -92,7 +94,7 @@ Response:
   "timestamp": "2026-04-10T02:00:00.000Z",
   "uptime": 123.45,
   "database": "connected",
-  "version": "5.47.1"
+  "version": "5.49.0"
 }
 ```
 
