@@ -1,10 +1,10 @@
 # Strapi Base
 
-Production-ready Strapi 5.49.0 base image for HelmForge charts.
+Production-ready Strapi 5.50.0 base image for HelmForge charts.
 
 ## Features
 
-- **Strapi 5.49.0** - Latest stable
+- **Strapi 5.50.0** - Packaged stable release
 - **Node.js 22 Alpine** - LTS base
 - **Multi-database** - SQLite, PostgreSQL, MySQL
 - **Multi-arch** - linux/amd64, linux/arm64
@@ -18,7 +18,7 @@ Production-ready Strapi 5.49.0 base image for HelmForge charts.
 ### Docker
 
 ```bash
-docker pull helmforge/strapi-base:5.49.0
+docker pull helmforge/strapi-base:5.50.0
 
 docker run -p 1337:1337 \
   -e APP_KEYS="key1,key2,key3,key4" \
@@ -27,7 +27,7 @@ docker run -p 1337:1337 \
   -e JWT_SECRET="your-secret" \
   -e TRANSFER_TOKEN_SALT="your-salt" \
   -e ENCRYPTION_KEY="your-encryption-key" \
-  helmforge/strapi-base:5.49.0
+  helmforge/strapi-base:5.50.0
 ```
 
 ### Docker Compose
@@ -52,12 +52,12 @@ helm install strapi helmforge/strapi
 
 **Development** (Content-Type Builder enabled):
 ```bash
-docker run -e NODE_ENV=development helmforge/strapi-base:5.49.0
+docker run -e NODE_ENV=development helmforge/strapi-base:5.50.0
 ```
 
 **Production** (optimized, schema fixed):
 ```bash
-docker run -e NODE_ENV=production helmforge/strapi-base:5.49.0
+docker run -e NODE_ENV=production helmforge/strapi-base:5.50.0
 ```
 
 ## Environment Variables
@@ -94,7 +94,7 @@ Response:
   "timestamp": "2026-04-10T02:00:00.000Z",
   "uptime": 123.45,
   "database": "connected",
-  "version": "5.49.0"
+  "version": "5.50.0"
 }
 ```
 
