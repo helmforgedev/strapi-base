@@ -1,11 +1,12 @@
 # Strapi Base
 
-Production-ready Strapi 5.50.2 base image for HelmForge charts.
+Production-ready Strapi 5.51.1 base image for HelmForge charts.
 
 ## Features
 
-- **Strapi 5.50.2** - Packaged stable release
+- **Strapi 5.51.1** - Packaged stable release
 - **Node.js 22 Alpine** - LTS base
+- **Hardened runtime** - Build-only npm and Vite tooling removed from the final image
 - **Multi-database** - SQLite, PostgreSQL, MySQL
 - **Multi-arch** - linux/amd64, linux/arm64
 - **Security hardened** - Non-root, minimal Alpine
@@ -18,7 +19,7 @@ Production-ready Strapi 5.50.2 base image for HelmForge charts.
 ### Docker
 
 ```bash
-docker pull helmforge/strapi-base:5.50.2
+docker pull helmforge/strapi-base:5.51.1
 
 docker run -p 1337:1337 \
   -e APP_KEYS="key1,key2,key3,key4" \
@@ -27,7 +28,7 @@ docker run -p 1337:1337 \
   -e JWT_SECRET="your-secret" \
   -e TRANSFER_TOKEN_SALT="your-salt" \
   -e ENCRYPTION_KEY="your-encryption-key" \
-  helmforge/strapi-base:5.50.2
+  helmforge/strapi-base:5.51.1
 ```
 
 ### Docker Compose
@@ -37,9 +38,10 @@ docker-compose up -d
 ```
 
 Access:
-- Admin panel: http://localhost:1337/admin
-- API: http://localhost:1337/api
-- Adminer (DB): http://localhost:9090
+
+- Admin panel: <http://localhost:1337/admin>
+- API: <http://localhost:1337/api>
+- Adminer (DB): <http://localhost:9090>
 
 ### Kubernetes
 
@@ -51,13 +53,15 @@ helm install strapi helmforge/strapi
 ## Development vs Production
 
 **Development** (Content-Type Builder enabled):
+
 ```bash
-docker run -e NODE_ENV=development helmforge/strapi-base:5.50.2
+docker run -e NODE_ENV=development helmforge/strapi-base:5.51.1
 ```
 
 **Production** (optimized, schema fixed):
+
 ```bash
-docker run -e NODE_ENV=production helmforge/strapi-base:5.50.2
+docker run -e NODE_ENV=production helmforge/strapi-base:5.51.1
 ```
 
 ## Environment Variables
@@ -65,6 +69,7 @@ docker run -e NODE_ENV=production helmforge/strapi-base:5.50.2
 See [.env.example](.env.example) for all configuration options.
 
 ### Required
+
 - `APP_KEYS` - Session keys (comma-separated, 4 keys minimum)
 - `API_TOKEN_SALT` - API token salt
 - `ADMIN_JWT_SECRET` - Admin JWT secret
@@ -73,6 +78,7 @@ See [.env.example](.env.example) for all configuration options.
 - `ENCRYPTION_KEY` - Admin encryption key
 
 ### Database (PostgreSQL)
+
 - `DATABASE_CLIENT=postgres`
 - `DATABASE_HOST` - Database host
 - `DATABASE_PORT=5432`
@@ -88,13 +94,14 @@ curl http://localhost:1337/_health
 ```
 
 Response:
+
 ```json
 {
   "status": "ok",
   "timestamp": "2026-04-10T02:00:00.000Z",
   "uptime": 123.45,
   "database": "connected",
-  "version": "5.50.2"
+  "version": "5.51.1"
 }
 ```
 
@@ -118,8 +125,8 @@ docker build -t strapi-base:prod -f Dockerfile.prod .
 
 ## Documentation
 
-- Chart: https://helmforge.dev/docs/charts/strapi
-- Strapi: https://docs.strapi.io
+- Chart: <https://helmforge.dev/docs/charts/strapi>
+- Strapi: <https://docs.strapi.io>
 
 ## License
 
