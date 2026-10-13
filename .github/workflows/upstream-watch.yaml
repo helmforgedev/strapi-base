@@ -24,6 +24,9 @@ jobs:
           node-version: "22"
           cache: npm
 
+      - name: Test release notes filter
+        run: node --test .github/scripts/filter-release-notes.test.mjs
+
       - name: Open issue when upstream has a newer release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -61,7 +64,11 @@ jobs:
             RELEASE_URL="$(jq -r '.html_url' <<< "$release_json")"
             PUBLISHED_AT="$(jq -r '.published_at' <<< "$release_json")"
             RELEASE_NAME="$(jq -r '.name // .tag_name' <<< "$release_json")"
-            RELEASE_NOTES="$(jq -r '.body // "No release notes provided."' <<< "$release_json" | head -c 12000)"
+            RELEASE_NOTES="$(
+              jq -r '.body // "No release notes provided."' <<< "$release_json" |
+                node .github/scripts/filter-release-notes.mjs
+            )"
+            RELEASE_NOTES="${RELEASE_NOTES:0:12000}"
           else
             RELEASE_URL="${RELEASES_URL}"
             PUBLISHED_AT="unknown"
