@@ -114,3 +114,43 @@ test('filters release notes received through standard input', () => {
   assert.equal(result.status, 0, result.stderr);
   assert.equal(result.stdout, '### Fixes\n- Preserve this fix.');
 });
+
+test('ignores Thank You headings inside fenced code blocks', () => {
+  const releaseNotes = [
+    '### Examples',
+    '````markdown',
+    '### Thank You',
+    '```',
+    'This shorter fence does not close the example.',
+    '````',
+    '### Security',
+    '- Preserve this security note.',
+  ].join('\n');
+
+  assert.equal(filterReleaseNotes(releaseNotes), releaseNotes);
+});
+
+test('ignores section headings inside fences in an omitted section', () => {
+  const releaseNotes = [
+    '### Fixes',
+    '- Preserve this fix.',
+    '### Thank You',
+    '~~~markdown',
+    '### Security',
+    '```',
+    '~~~',
+    '- Contributor @example-user',
+    '### Compatibility',
+    '- Preserve this compatibility note.',
+  ].join('\n');
+
+  assert.equal(
+    filterReleaseNotes(releaseNotes),
+    [
+      '### Fixes',
+      '- Preserve this fix.',
+      '### Compatibility',
+      '- Preserve this compatibility note.',
+    ].join('\n'),
+  );
+});
