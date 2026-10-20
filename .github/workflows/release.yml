@@ -32,7 +32,7 @@ jobs:
       - name: Get Strapi version
         id: strapi
         run: |
-          STRAPI_VERSION=$(node -p "require('./package.json').dependencies['@strapi/strapi']")
+          STRAPI_VERSION=$(node -p "require('./package.json').dependencies['@strapi/strapi'].replace(/[^0-9.]/g, '')")
           echo "Strapi version: $STRAPI_VERSION"
           echo "version=$STRAPI_VERSION" >> $GITHUB_OUTPUT
 
